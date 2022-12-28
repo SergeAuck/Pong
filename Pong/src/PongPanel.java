@@ -17,6 +17,7 @@ public class PongPanel extends JPanel implements ActionListener, KeyListener {
 	private final static Color BACKGROUND_COLOR = Color.black;
 	private static int TIMER_DELAY = 5;
 	Ball ball;
+	private final static int BALL_MOVEMENT_SPEED = 2; //not sure if it is a correct place
 	//private static boolean gameInitialised = false; not required anymore
 	GameState gameState = GameState.INITIALISING;
 	
@@ -30,6 +31,8 @@ public class PongPanel extends JPanel implements ActionListener, KeyListener {
 		//The Timer class provides functionality to perform a task repeatedly
 		Timer timer = new Timer(TIMER_DELAY, this);
 		timer.start();
+		addKeyListener(this); //program is listening to the keyboard
+		setFocusable(true); //??
 	}
 	
 	//creates the ball object
@@ -75,14 +78,31 @@ public class PongPanel extends JPanel implements ActionListener, KeyListener {
 
 	@Override
 	public void keyPressed(KeyEvent event) {
-		// TODO Auto-generated method stub
+		if(event.getKeyCode() == KeyEvent.VK_UP) {
+			paddle2.setyVelocity(-1);
+		}
+		else if(event.getKeyCode() == KeyEvent.VK_DOWN) {
+			paddle2.setyVelocity(1);
+		}
 		
+		if(event.getKeyCode() == KeyEvent.VK_W) {
+			paddle1.setyVelocity(-1);
+		}
+		else if(event.getKeyCode() == KeyEvent.VK_S) {
+			paddle1.setyVelocity(1);
+		}
+				
 	}
 
 	@Override
 	public void keyReleased(KeyEvent event) {
-		// TODO Auto-generated method stub
+		if(event.getKeyCode() == KeyEvent.VK_UP || event.getKeyCode() == KeyEvent.VK_DOWN) {
+			paddle2.setyVelocity(0);
+		}
 		
+		if(event.getKeyCode() == KeyEvent.VK_W || event.getKeyCode() == KeyEvent.VK_S) {
+			paddle1.setyVelocity(0);
+		}
 	}
 
 	@Override
@@ -102,15 +122,47 @@ public class PongPanel extends JPanel implements ActionListener, KeyListener {
 		case INITIALISING : {
 			createObjects();
 			gameState = GameState.PLAYING;
+			ball.setxVelocity(BALL_MOVEMENT_SPEED);
+			ball.setyVelocity(BALL_MOVEMENT_SPEED);
 			break;
 		}
 		case PLAYING: {
+			moveObject(paddle1);
+			moveObject(paddle2);
+			moveObject(ball); //move ball
+			checkWallBounce(); //check for wall bounce
 			break;
 		}
 		case GAMEOVER: {
 			break;
 		}
 		}
+	}
+	
+	public void moveObject(Sprite obj) {
+		obj.setxPosition(obj.getxPosition() + obj.getxVelocity(),getWidth());
+		obj.setyPosition(obj.getyPosition() + obj.getyVelocity(),getHeight());
+	}
+	
+	public void checkWallBounce() {
+		if(ball.getxPosition() <= 0) {
+			//hit the left side of the screen
+			//ball.setxVelocity(-ball.getxVelocity());  - to bounce the ball. not needed
+			resetBall();
+		}
+		else if (ball.getxPosition() >= getWidth() - ball.getWidth()) {
+			//hit the right side of the screen
+			//ball.setxVelocity(-ball.getxVelocity());
+			resetBall();
+		}
+		if(ball.getyPosition() <= 0 || ball.getyPosition() >= getHeight() - ball.getHeight()) {
+			//hit top or bottom of screen
+			ball.setyVelocity(-ball.getyVelocity());
+		}
+	}
+	
+	public void resetBall() {
+		ball.resetToInitialPositions();
 	}
 
 }
