@@ -11,7 +11,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.BasicStroke;
-//import java.awt.
+import java.awt.Font;
 
 public class PongPanel extends JPanel implements ActionListener, KeyListener {
 	
@@ -21,6 +21,15 @@ public class PongPanel extends JPanel implements ActionListener, KeyListener {
 	private final static int BALL_MOVEMENT_SPEED = 2; //not sure if it is a correct place
 	private final static int POINTS_TO_WIN = 3;
 	int player1Score =0, player2Score = 0;
+	private final static int SCORE_TEXT_X = 100;
+	private final static int SCORE_TEXT_Y = 100;
+	private final static int SCORE_FONT_SIZE = 50;
+	private final static String SCORE_FONT_FAMILY = "Serif";
+	private final static int WINNER_TEXT_X = 200;
+	private final static int WINNER_TEXT_Y = 200;
+	private final static int WINNER_FONT_SIZE = 40;
+	private final static String WINNER_FONT_FAMILY = "Serif";
+	private final static String WINNER_TEXT = "WIN!";
 	Player gameWinner;
 	
 	//private static boolean gameInitialised = false; not required anymore
@@ -61,6 +70,7 @@ public class PongPanel extends JPanel implements ActionListener, KeyListener {
 			paintSprite(g, paddle1);
 			paintSprite(g, paddle2);
 			paintScores(g);
+			paintWinner(g);
 		}
 		//g.setColor(Color.WHITE); DELETE
 		//g.fillRect(20, 20, 100, 100); DELETE
@@ -195,22 +205,33 @@ public class PongPanel extends JPanel implements ActionListener, KeyListener {
 			gameWinner = Player.One;
 			gameState = GameState.GAMEOVER;
 		}
-		else if(player2Score == 3) {
+		else if(player2Score >= POINTS_TO_WIN) {
 			gameWinner = Player.Two;
 			gameState = GameState.GAMEOVER;
 		}
 	}
 	
 	private void paintScores(Graphics g) {
-		int xPadding = 100;
-		int yPadding = 100;
-		int fontSize = 50;
-		Font scoreFont = new Font("Serif", Font.BOLD, fontSize);
+		Font scoreFont = new Font(SCORE_FONT_FAMILY, Font.BOLD, SCORE_FONT_SIZE);
 		String leftScore = Integer.toString(player1Score);
 		String rightScore = Integer.toString(player2Score);
 		g.setFont(scoreFont);
-		g.drawString(leftScore, xPadding, yPadding);
-		g.drawString(rightScore, xPadding, yPadding);
+		g.drawString(leftScore, SCORE_TEXT_X, SCORE_TEXT_Y);
+		g.drawString(rightScore, getWidth()-SCORE_TEXT_X, SCORE_TEXT_Y);
 	}
+	
+	private void paintWinner (Graphics g) {
+		Font winFont = new Font(WINNER_FONT_FAMILY, Font.BOLD, WINNER_FONT_SIZE);
+		g.setFont(winFont);
+		if(gameWinner != null) {
+		if(gameWinner == Player.One) {
+			g.drawString(WINNER_TEXT, WINNER_TEXT_X, WINNER_TEXT_Y);
+		}
+		else if(gameWinner == Player.Two) {
+			g.drawString(WINNER_TEXT, getWidth() - WINNER_TEXT_X, WINNER_TEXT_Y);
+		} 
+		}
+	}
+
 
 }
